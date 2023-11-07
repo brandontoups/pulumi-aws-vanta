@@ -1,7 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 
-export interface VantaConnectionArgs {
+export interface VantaConnectionComponentArgs {
   /**
    * The AWS account ID for the account to be audited.
    */
@@ -13,24 +13,16 @@ export interface VantaConnectionArgs {
 }
 
 export class VantaConnectionComponent extends pulumi.ComponentResource {
-  private accountId: pulumi.Output<String>;
-  private externalId: pulumi.Output<String>;
-  private vantaAdditionalPermissions: aws.iam.Policy;
   public readonly vantaAuditor: aws.iam.Role;
 
   constructor(
     name: string,
-    args: {
-      accountId: pulumi.Output<String>;
-      externalId: pulumi.Output<String>;
-    },
+    args: VantaConnectionComponentArgs,
     opts?: pulumi.ComponentResourceOptions
   ) {
     super("vanta:index:VantaConnectionComponent", name, args, opts);
-    this.accountId = args.accountId;
-    this.externalId = args.externalId;
 
-    this.vantaAdditionalPermissions = new aws.iam.Policy(
+    const vantaAdditionalPermissions = new aws.iam.Policy(
       `VantaAdditionalPermissions`,
       {
         name: `VantaAdditionalPermissions`,
@@ -81,12 +73,12 @@ export class VantaConnectionComponent extends pulumi.ComponentResource {
             {
               Effect: "Allow",
               Principal: {
-                AWS: pulumi.interpolate`arn:aws:iam::${this.accountId}:root`,
+                AWS: pulumi.interpolate`arn:aws:iam::${args.accountId}:root`,
               },
               Action: "sts:AssumeRole",
               Condition: {
                 StringEquals: {
-                  "sts:ExternalId": pulumi.interpolate`${this.externalId}`,
+                  "sts:ExternalId": pulumi.interpolate`${args.externalId}`,
                 },
               },
             },
@@ -95,7 +87,7 @@ export class VantaConnectionComponent extends pulumi.ComponentResource {
         description: "Auditor account for Vanta SOC2 compliance monitoring.",
         managedPolicyArns: [
           "arn:aws:iam::aws:policy/SecurityAudit",
-          this.vantaAdditionalPermissions.arn,
+          vantaAdditionalPermissions.arn,
         ],
       },
       {
