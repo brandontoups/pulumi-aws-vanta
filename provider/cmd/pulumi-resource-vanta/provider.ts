@@ -29,7 +29,6 @@ export class Provider implements provider.Provider {
     inputs: pulumi.Inputs,
     options: pulumi.ComponentResourceOptions
   ): Promise<provider.ConstructResult> {
-    // TODO: Add support for additional component resources here.
     switch (type) {
       case "vanta:index:VantaConnectionComponent":
         return await constructVantaConnectionComponent(name, inputs, options);

@@ -1,26 +1,26 @@
 {
   "name": "vanta",
   "resources": {
-    "vanta:index:StaticPage": {
+    "vanta:index:VantaConnectionComponent": {
       "isComponent": true,
       "inputProperties": {
-        "indexContent": {
+        "accountId": {
           "type": "string",
-          "description": "The HTML content for index.html."
-        }
-      },
-      "requiredInputs": ["indexContent"],
-      "properties": {
-        "bucket": {
-          "$ref": "/aws/v4.0.0/schema.json#/resources/aws:s3%2Fbucket:Bucket",
-          "description": "The bucket resource."
+          "description": "Provided by Vanta. The AWS account ID."
         },
-        "websiteUrl": {
+        "externalId": {
           "type": "string",
-          "description": "The website URL."
+          "description": "Provided by Vanta. The external ID."
         }
       },
-      "required": ["bucket", "websiteUrl"]
+      "requiredInputs": ["accountId", "externalId"],
+      "properties": {
+        "vantaAuditorArn": {
+          "type": "string",
+          "description": "The ARN of the Vanta auditor role. You will copy the Role ARN from AWS, and paste it into Vanta."
+        }
+      },
+      "required": ["vantaAuditorArn"]
     }
   },
   "language": {
@@ -38,10 +38,12 @@
     },
     "nodejs": {
       "dependencies": {
-        "@pulumi/aws": "^5.0.0"
+        "@pulumi/aws": "^5.0.0",
+        "@types/node": "^20.8.10"
       },
       "devDependencies": {
-        "typescript": "^3.7.0"
+        "typescript": "^3.7.0",
+        "@types/node": "^20.8.10"
       },
       "respectSchemaVersion": true
     },
